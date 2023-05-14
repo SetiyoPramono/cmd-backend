@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Province {
+  id    String  @id @default(uuid())
+  name  String
+  City  City[]
+  Voter Voter[]
+}
+
+model City {
+  id          String        @id @default(uuid())
+  name        String
+  province    Province      @relation(fields: [provinceId], references: [id])
+  provinceId  String
+  Subdistrict Subdistrict[]
+  Voter       Voter[]
+  Candidate   Candidate[]
+}
+
+model Subdistrict {
+  id      String    @id @default(uuid())
+  name    String
+  city    City      @relation(fields: [cityId], references: [id])
+  cityId  String
+  Village Village[]
+  Voter   Voter[]
+}
+
+model Village {
+  id            String      @id @default(uuid())
+  name          String
+  subdistrict   Subdistrict @relation(fields: [subdistrictId], references: [id])
+  subdistrictId String
+  Voter         Voter[]
+}
+
+model User {
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+  salt     String
+  role     Role   @relation(fields: [roleId], references: [id])
+  roleId   String
+}
+
+model Role {
+  id   String @id @default(uuid())
+  name String
+  User User[]
+}
+
+model Voter {
+  id            String      @id @default(uuid())
+  name          String
+  phoneNumber   String
+  province      Province    @relation(fields: [provinceId], references: [id])
+  city          City        @relation(fields: [cityId], references: [id])
+  subdistrict   Subdistrict @relation(fields: [subdistrictId], references: [id])
+  village       Village     @relation(fields: [villageId], references: [id])
+  address       String
+  status        Boolean
+  candidate     Candidate   @relation(fields: [candidateId], references: [id])
+  eMoney        Emoney      @relation(fields: [emoneyId], references: [id])
+  candidateId   String
+  emoneyId      String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  provinceId    String
+  cityId        String
+  subdistrictId String
+  villageId     String
+}
+
+model Emoney {
+  id    String  @id @default(uuid())
+  name  String
+  Voter Voter[]
+}
+
+model Candidate {
+  id       String  @id @default(uuid())
+  name     String
+  imageId  String?
+  imageUrl String?
+  number   Int
+  dapil    City[]
+  Voter    Voter[]
+}
